@@ -5,7 +5,8 @@ import 'package:flutter/services.dart';
 
 typedef OnCodeEnteredCompletion = void Function(String value);
 typedef OnCodeChanged = void Function(String value);
-typedef HandleControllers = void Function(List<TextEditingController?> controllers);
+typedef HandleControllers = void Function(
+    List<TextEditingController?> controllers);
 
 class OtpTextField extends StatefulWidget {
   final bool showCursor;
@@ -31,7 +32,7 @@ class OtpTextField extends StatefulWidget {
   final bool filled;
   final bool autoFocus;
   final bool readOnly;
-   bool clearText;
+  bool clearText;
   final bool hasCustomInputDecoration;
   final Color fillColor;
   final BorderRadius borderRadius;
@@ -39,38 +40,45 @@ class OtpTextField extends StatefulWidget {
   final List<TextStyle?> styles;
   final List<TextInputFormatter>? inputFormatters;
 
-  OtpTextField({
-    this.showCursor = true,
-    this.numberOfFields = 4,
-    this.fieldWidth = 40.0,
-    this.margin = const EdgeInsets.only(right: 8.0),
-    this.textStyle,
-    this.clearText = false,
-    this.styles = const [],
-    this.keyboardType = TextInputType.number,
-    this.borderWidth = 2.0,
-    this.cursorColor,
-    this.disabledBorderColor = const Color(0xFFE7E7E7),
-    this.enabledBorderColor = const Color(0xFFE7E7E7),
-    this.borderColor = const Color(0xFFE7E7E7),
-    this.focusedBorderColor = const Color(0xFF4F44FF),
-    this.mainAxisAlignment = MainAxisAlignment.center,
-    this.crossAxisAlignment = CrossAxisAlignment.center,
-    this.handleControllers,
-    this.onSubmit,
-    this.obscureText = false,
-    this.showFieldAsBox = false,
-    this.enabled = true,
-    this.autoFocus = false,
-    this.hasCustomInputDecoration = false,
-    this.filled = false,
-    this.fillColor = const Color(0xFFFFFFFF),
-    this.readOnly = false,
-    this.decoration,
-    this.onCodeChanged,
-    this.borderRadius = const BorderRadius.all(Radius.circular(4.0)),
-    this.inputFormatters,
-  })  : assert(numberOfFields > 0),
+  // albc added
+  final List<Color>? gradColorsContainer;
+
+  OtpTextField(
+      {this.showCursor = true,
+      this.numberOfFields = 4,
+      this.fieldWidth = 40.0,
+      this.margin = const EdgeInsets.only(right: 8.0),
+      this.textStyle,
+      this.clearText = false,
+      this.styles = const [],
+      this.keyboardType = TextInputType.number,
+      this.borderWidth = 2.0,
+      this.cursorColor,
+      this.disabledBorderColor = const Color(0xFFE7E7E7),
+      this.enabledBorderColor = const Color(0xFFE7E7E7),
+      this.borderColor = const Color(0xFFE7E7E7),
+      this.focusedBorderColor = const Color(0xFF4F44FF),
+      this.mainAxisAlignment = MainAxisAlignment.center,
+      this.crossAxisAlignment = CrossAxisAlignment.center,
+      this.handleControllers,
+      this.onSubmit,
+      this.obscureText = false,
+      this.showFieldAsBox = false,
+      this.enabled = true,
+      this.autoFocus = false,
+      this.hasCustomInputDecoration = false,
+      this.filled = false,
+      this.fillColor = const Color(0xFFFFFFFF),
+      this.readOnly = false,
+      this.decoration,
+      this.onCodeChanged,
+      this.borderRadius = const BorderRadius.all(Radius.circular(4.0)),
+      this.inputFormatters,
+      this.gradColorsContainer = const [
+        Colors.transparent,
+        Colors.transparent
+      ]})
+      : assert(numberOfFields > 0),
         assert(styles.length > 0
             ? styles.length == numberOfFields
             : styles.length == 0);
@@ -99,12 +107,12 @@ class _OtpTextFieldState extends State<OtpTextField> {
   @override
   void didUpdateWidget(covariant OtpTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if(oldWidget.clearText != widget.clearText && widget.clearText == true) {
-      for (var controller in _textControllers ){
+    if (oldWidget.clearText != widget.clearText && widget.clearText == true) {
+      for (var controller in _textControllers) {
         controller?.clear();
       }
       _verificationCode = List<String?>.filled(widget.numberOfFields, null);
-      setState((){
+      setState(() {
         widget.clearText = false;
       });
     }
@@ -128,54 +136,64 @@ class _OtpTextFieldState extends State<OtpTextField> {
     TextStyle? style,
   }) {
     return Container(
-      width: widget.fieldWidth,
-      margin: widget.margin,
-      child: TextField(
-        showCursor: widget.showCursor,
-        keyboardType: widget.keyboardType,
-        textAlign: TextAlign.center,
-        maxLength: 1,
-        readOnly: widget.readOnly,
-        style: style ?? widget.textStyle,
-        autofocus: widget.autoFocus,
-        cursorColor: widget.cursorColor,
-        controller: _textControllers[index],
-        focusNode: _focusNodes[index],
-        enabled: widget.enabled,
-        inputFormatters: widget.inputFormatters,
-        decoration: widget.hasCustomInputDecoration
-            ? widget.decoration
-            : InputDecoration(
-                counterText: "",
-                filled: widget.filled,
-                fillColor: widget.fillColor,
-                focusedBorder: widget.showFieldAsBox
-                    ? outlineBorder(widget.focusedBorderColor)
-                    : underlineInputBorder(widget.focusedBorderColor),
-                enabledBorder: widget.showFieldAsBox
-                    ? outlineBorder(widget.enabledBorderColor)
-                    : underlineInputBorder(widget.enabledBorderColor),
-                disabledBorder: widget.showFieldAsBox
-                    ? outlineBorder(widget.disabledBorderColor)
-                    : underlineInputBorder(widget.disabledBorderColor),
-                border: widget.showFieldAsBox
-                    ? outlineBorder(widget.borderColor)
-                    : underlineInputBorder(widget.borderColor),
-              ),
-        obscureText: widget.obscureText,
-        onChanged: (String value) {
-          //save entered value in a list
-          _verificationCode[index] = value;
-          onCodeChanged(verificationCode: value);
-          changeFocusToNextNodeWhenValueIsEntered(
-            value: value,
-            indexOfTextField: index,
-          );
-          changeFocusToPreviousNodeWhenValueIsRemoved(value: value, indexOfTextField: index);
-          onSubmit(verificationCode: _verificationCode);
-        },
-      ),
-    );
+        width: widget.fieldWidth,
+        margin: widget.margin,
+        padding: EdgeInsets.all(1),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: widget.gradColorsContainer ??
+                [Colors.transparent, Colors.transparent],
+            begin: Alignment.topLeft,
+            end: Alignment.centerRight,
+          ),
+        ),
+        child: TextField(
+          showCursor: widget.showCursor,
+          keyboardType: widget.keyboardType,
+          textAlign: TextAlign.center,
+          maxLength: 1,
+          textAlignVertical: TextAlignVertical.bottom,
+          readOnly: widget.readOnly,
+          style: style ?? widget.textStyle,
+          autofocus: widget.autoFocus,
+          cursorColor: widget.cursorColor,
+          controller: _textControllers[index],
+          focusNode: _focusNodes[index],
+          enabled: widget.enabled,
+          inputFormatters: widget.inputFormatters,
+          decoration: widget.hasCustomInputDecoration
+              ? widget.decoration
+              : InputDecoration(
+                  counterText: "",
+                  filled: widget.filled,
+                  fillColor: widget.fillColor,
+                  focusedBorder: widget.showFieldAsBox
+                      ? outlineBorder(widget.focusedBorderColor)
+                      : underlineInputBorder(widget.focusedBorderColor),
+                  enabledBorder: widget.showFieldAsBox
+                      ? outlineBorder(widget.enabledBorderColor)
+                      : underlineInputBorder(widget.enabledBorderColor),
+                  disabledBorder: widget.showFieldAsBox
+                      ? outlineBorder(widget.disabledBorderColor)
+                      : underlineInputBorder(widget.disabledBorderColor),
+                  border: widget.showFieldAsBox
+                      ? outlineBorder(widget.borderColor)
+                      : underlineInputBorder(widget.borderColor),
+                ),
+          obscureText: widget.obscureText,
+          onChanged: (String value) {
+            //save entered value in a list
+            _verificationCode[index] = value;
+            onCodeChanged(verificationCode: value);
+            changeFocusToNextNodeWhenValueIsEntered(
+              value: value,
+              indexOfTextField: index,
+            );
+            changeFocusToPreviousNodeWhenValueIsRemoved(
+                value: value, indexOfTextField: index);
+            onSubmit(verificationCode: _verificationCode);
+          },
+        ));
   }
 
   OutlineInputBorder outlineBorder(Color color) {
@@ -214,7 +232,6 @@ class _OtpTextFieldState extends State<OtpTextField> {
       }
       return _buildTextField(context: context, index: i);
     });
-
 
     return Row(
       mainAxisAlignment: widget.mainAxisAlignment,
@@ -267,7 +284,6 @@ class _OtpTextFieldState extends State<OtpTextField> {
       }
     }
   }
-
 
   void onSubmit({required List<String?> verificationCode}) {
     if (verificationCode.every((String? code) => code != null && code != '')) {
